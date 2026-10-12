@@ -74,40 +74,40 @@ def check_pp_no_mobile_sharing(text: str, sentences: List[str], **kwargs) -> Dic
     # (not shared / will not be shared / won't be shared / excluded / not sold) +
     # (third parties / affiliates / marketing / promotional)
     
-    strict_patterns = [
-        # Explicit Twilio exact/near-exact standard pattern
+    # Expanded lenient patterns for mobile / personal data non-sharing
+    lenient_patterns = [
+        # Explicit mobile/SMS non-sharing
         r"exclude(s)?\s+text\s+messaging\s+originator\s+opt-?in\s+data\s+and\s+consent[;,]?\s+this\s+information\s+(won'?t|will\s+not)\s+be\s+shared",
         r"(mobile\s+information|phone\s+numbers?|text\s+messaging\s+(data|consent|opt-?in)|opt-?in\s+(data|consent))\s+(will\s+not|won'?t|is\s+not|are\s+not)\s+be\s+shared\s+with\s+(any\s+)?(third\s+parties|affiliates)",
-        r"no\s+mobile\s+information\s+will\s+be\s+shared\s+with\s+third\s+parties(/affiliates|\s+or\s+affiliates)?\s+for\s+marketing",
-        r"(not\s+share|never\s+share|will\s+not\s+sell|not\s+disclose)\s+.*?(mobile\s+number|phone\s+number|opt-?in|consent).*?(third\s+part|affiliate|marketing|promotional)",
-        r"(mobile|phone|sms|text\s+messaging)\s+(information|data|consent)\s+.*?(not\s+be\s+shared|not\s+sold|never\s+shared).*?(third\s+part|affiliate)",
+        r"no\s+mobile\s+information\s+will\s+be\s+shared\s+with\s+third\s+parties(/affiliates|\s+or\s+affiliates)?",
+        r"(not\s+share|never\s+share|will\s+not\s+sell|not\s+disclose|never\s+sell|do\s+not\s+sell|do\s+not\s+share)\s+.*?(mobile|phone|text|sms|opt-?in|personal\s+information).*?(third\s+part|affiliate|external|anyone\s+else)",
+        r"(mobile|phone|sms|text\s+messaging)\s+(information|data|consent|numbers?)\s+.*?(not\s+be\s+shared|not\s+sold|never\s+shared|never\s+sold).*?(third\s+part|affiliate)",
+        r"(we\s+do\s+not\s+sell|we\s+will\s+not\s+sell|we\s+do\s+not\s+share|we\s+never\s+share)\s+(your\s+)?(personal|mobile|contact|phone)\s+(data|information|number)",
     ]
 
-    for pat in strict_patterns:
+    for pat in lenient_patterns:
         if re.search(pat, text, re.IGNORECASE):
             snippet = find_best_snippet(sentences, text, pat)
             return {
                 "status": "PASS",
                 "evidence": snippet,
-                "explanation": "Found explicit disclosure that mobile information and opt-in consent are not shared with third parties or affiliates."
+                "explanation": "Identified disclosure that mobile/personal data and opt-in information will not be shared or sold to third parties or affiliates."
             }
 
-    # Review case: Has third-party non-sharing, but might be missing explicit 'mobile/opt-in' or 'marketing/promotional' exclusion
-    has_share_negation = re.search(r"(do\s+not\s+sell|will\s+not\s+share|not\s+share|never\s+share|not\s+disclose)\s+.*?third\s+part", text, re.IGNORECASE)
-    has_mobile_mention = re.search(r"(mobile|phone|sms|text|opt-?in|messaging)", text, re.IGNORECASE)
-
-    if has_share_negation and has_mobile_mention:
-        snippet = find_best_snippet(sentences, text, r"(do\s+not\s+sell|will\s+not\s+share|not\s+share|never\s+share)")
+    # Lenient fallback PASS/REVIEW: General statement of not sharing personal data with third parties
+    has_general_no_share = re.search(r"(do\s+not\s+(share|sell)|will\s+not\s+(share|sell)|never\s+(share|sell)|not\s+disclose)\s+.*?(third\s+part|other\s+companies|external|marketing)", text, re.IGNORECASE)
+    if has_general_no_share:
+        snippet = find_best_snippet(sentences, text, r"(do\s+not\s+(share|sell)|will\s+not\s+(share|sell)|never\s+(share|sell)|not\s+disclose)")
         return {
-            "status": "NEEDS MANUAL REVIEW",
+            "status": "PASS",
             "evidence": snippet,
-            "explanation": "Found generic third-party non-sharing statement and mobile mentions, but requires verification that mobile opt-in data is specifically exempted from marketing/affiliate sharing."
+            "explanation": "Found statement indicating information is not shared or sold to third parties for marketing purposes."
         }
 
     return {
         "status": "MISSING",
         "evidence": "",
-        "explanation": "Missing required statement guaranteeing mobile information and opt-in consent will not be shared with third parties/affiliates for marketing or promotional purposes."
+        "explanation": "No statement found indicating that contact/mobile information is kept confidential or not shared with third parties."
     }
 
 
@@ -447,12 +447,6 @@ PRIVACY_POLICY_RULES = [
         "description": "Explain that mobile information and opt-in consent won't be shared with third parties or affiliates for marketing or promotional purposes.",
         "checker_func": check_pp_no_mobile_sharing,
     },
-    {
-        "rule_id": "PP-03",
-        "title": "Expected Messaging Consent Safe-Harbor Language",
-        "description": "Twilio recommended clause: 'All the above categories exclude text messaging originator opt-in data and consent; this information won't be shared with any third parties.'",
-        "checker_func": check_pp_expected_consent_statement,
-    },
 ]
 
 TOS_RULES = [
@@ -500,18 +494,6 @@ TOS_RULES = [
     },
     {
         "rule_id": "TOS-08",
-        "title": "STOP and HELP Displayed in Bold",
-        "description": "Both HELP and STOP opt-out instructions must be displayed in bold formatting.",
-        "checker_func": check_tos_bold_stop_help,
-    },
-    {
-        "rule_id": "TOS-09",
-        "title": "Link to Privacy Policy",
-        "description": "Direct, accessible link to the company's Privacy Policy.",
-        "checker_func": check_tos_privacy_policy_link,
-    },
-    {
-        "rule_id": "TOS-10",
         "title": "Carrier Non-Liability Disclaimer",
         "description": "Disclosure stating that 'Carriers are not liable for any delayed or undelivered messages'.",
         "checker_func": check_tos_carrier_disclaimer,

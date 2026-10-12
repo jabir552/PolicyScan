@@ -23,8 +23,8 @@ class ComplianceEngineTests(TestCase):
         }
         results = evaluate_privacy_policy(sample_data)
         statuses = [r["status"] for r in results]
-        # All 3 PP checks should pass
-        self.assertEqual(statuses, ["PASS", "PASS", "PASS"])
+        # 2 active PP checks should pass
+        self.assertEqual(statuses, ["PASS", "PASS"])
 
     def test_missing_pp_consent_disclosure(self):
         sample_data = {

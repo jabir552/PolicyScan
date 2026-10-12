@@ -32,7 +32,11 @@ ALLOWED_HOSTS = [
     "127.0.0.1",
     "localhost",
     ".vercel.app",
-    "*",  # Easy for initial deployment testing
+    "*",
+]
+
+CSRF_TRUSTED_ORIGINS = [
+    "https://*.vercel.app",
 ]
 
 

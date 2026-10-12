@@ -75,7 +75,7 @@ class ViewsAndWorkflowTests(TestCase):
     def test_index_page_loads(self):
         response = self.client.get(reverse("index"))
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response, "A2P 10DLC Compliance Checker")
+        self.assertContains(response, "PolicyScan")
 
     def test_demo_sample_page_loads(self):
         response = self.client.get(reverse("demo_sample") + "?type=compliant")

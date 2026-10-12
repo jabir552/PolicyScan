@@ -89,28 +89,39 @@ WSGI_APPLICATION = "config.wsgi.application"
 DATABASE_URL = os.getenv("DATABASE_URL", "").strip()
 
 if DATABASE_URL:
-    try:
+    import re
+    from urllib.parse import unquote
+
+    # Regex parser handles brackets around passwords, @ in passwords, and pooler domain names
+    match = re.match(
+        r"^postgres(?:ql)?://(?P<user>[^:]+):(?P<password>.+)@(?P<host>[^:/]+)(?::(?P<port>\d+))?/(?P<dbname>[^?]+)",
+        DATABASE_URL,
+    )
+    if match:
+        db_info = match.groupdict()
+        password = db_info["password"]
+        if password.startswith("[") and password.endswith("]"):
+            password = password[1:-1]
+        password = unquote(password)
+
+        DATABASES = {
+            "default": {
+                "ENGINE": "django.db.backends.postgresql",
+                "NAME": db_info["dbname"],
+                "USER": unquote(db_info["user"]),
+                "PASSWORD": password,
+                "HOST": db_info["host"],
+                "PORT": int(db_info["port"]) if db_info.get("port") else 5432,
+                "CONN_MAX_AGE": 600,
+            }
+        }
+    else:
         DATABASES = {
             "default": dj_database_url.parse(
                 DATABASE_URL,
                 conn_max_age=600,
                 conn_health_checks=True,
             )
-        }
-    except Exception:
-        # Fallback manual parsing for Supabase URIs with special characters
-        from urllib.parse import urlparse, unquote
-        parsed = urlparse(DATABASE_URL)
-        DATABASES = {
-            "default": {
-                "ENGINE": "django.db.backends.postgresql",
-                "NAME": parsed.path.lstrip("/"),
-                "USER": unquote(parsed.username) if parsed.username else "",
-                "PASSWORD": unquote(parsed.password) if parsed.password else "",
-                "HOST": parsed.hostname,
-                "PORT": parsed.port or 5432,
-                "CONN_MAX_AGE": 600,
-            }
         }
 else:
     DATABASES = {

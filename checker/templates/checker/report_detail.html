@@ -6,31 +6,31 @@
 <div class="row">
     <!-- Top Report Summary Bar -->
     <div class="col-12 mb-4">
-        <div class="d-flex flex-wrap align-items-center justify-content-between gap-3 p-3 bg-white rounded-3 border shadow-sm">
+        <div class="d-flex flex-wrap align-items-center justify-content-between gap-3 p-3 bg-body-tertiary rounded-3 border shadow-sm">
             <div>
                 <a href="{% url 'index' %}" class="btn btn-sm btn-outline-secondary me-2">
                     <i class="bi bi-arrow-left me-1"></i> New Scan
                 </a>
-                <span class="fs-4 fw-bold text-dark">Compliance Audit Report #{{ report.id }}</span>
-                <span class="text-muted ms-2 small">({{ report.created_at|date:"F d, Y - H:i:s" }} UTC)</span>
+                <span class="fs-4 fw-bold brand-font">Audit Report #{{ report.id }}</span>
+                <span class="text-secondary ms-2 small">({{ report.created_at|date:"F d, Y - H:i:s" }} UTC)</span>
             </div>
             <div class="d-flex gap-2">
-                <a href="{% url 'export_csv' report.id %}" class="btn btn-success d-flex align-items-center gap-1">
-                    <i class="bi bi-filetype-csv"></i> Download CSV Report
+                <a href="{% url 'export_csv' report.id %}" class="btn btn-success d-flex align-items-center gap-1 shadow-sm fw-medium">
+                    <i class="bi bi-filetype-csv"></i> Download CSV
                 </a>
-                <a href="{% url 'history' %}" class="btn btn-outline-primary">
+                <a href="{% url 'history' %}" class="btn btn-outline-primary fw-medium">
                     <i class="bi bi-list-ul"></i> All History
                 </a>
             </div>
         </div>
     </div>
 
-    <!-- Overview Metrics Cards -->
+    <!-- Overview Metrics Cards with VoiceStack styling -->
     <div class="col-md-3 mb-4">
-        <div class="card h-100 shadow-sm border-start border-4 border-primary">
-            <div class="card-body">
-                <span class="text-uppercase text-muted small fw-bold">Compliance Score</span>
-                <h2 class="display-6 fw-bold mb-1 text-primary">{{ pass_pct }}%</h2>
+        <div class="card h-100 metric-card score shadow-sm">
+            <div class="card-body ps-4">
+                <span class="text-uppercase text-secondary small fw-bold">Compliance Score</span>
+                <h2 class="display-6 fw-bold mb-1 text-primary brand-font">{{ pass_pct }}%</h2>
                 <div class="progress" style="height: 6px;">
                     <div class="progress-bar bg-primary" role="progressbar" style="width: {{ pass_pct }}%;"></div>
                 </div>
@@ -38,29 +38,29 @@
         </div>
     </div>
     <div class="col-md-3 mb-4">
-        <div class="card h-100 shadow-sm border-start border-4 border-success">
-            <div class="card-body">
-                <span class="text-uppercase text-muted small fw-bold">Passed Checks</span>
-                <h2 class="display-6 fw-bold mb-1 text-success">{{ report.passed_checks }}</h2>
-                <span class="small text-muted">Out of {{ report.total_checks }} total checks</span>
+        <div class="card h-100 metric-card pass shadow-sm">
+            <div class="card-body ps-4">
+                <span class="text-uppercase text-secondary small fw-bold">Passed Checks</span>
+                <h2 class="display-6 fw-bold mb-1 text-success brand-font">{{ report.passed_checks }}</h2>
+                <span class="small text-secondary">Out of {{ report.total_checks }} total requirements</span>
             </div>
         </div>
     </div>
     <div class="col-md-3 mb-4">
-        <div class="card h-100 shadow-sm border-start border-4 border-warning">
-            <div class="card-body">
-                <span class="text-uppercase text-muted small fw-bold">Needs Manual Review</span>
-                <h2 class="display-6 fw-bold mb-1 text-warning">{{ report.review_checks }}</h2>
-                <span class="small text-muted">Partial match / ambiguity</span>
+        <div class="card h-100 metric-card review shadow-sm">
+            <div class="card-body ps-4">
+                <span class="text-uppercase text-secondary small fw-bold">Needs Review</span>
+                <h2 class="display-6 fw-bold mb-1 text-warning brand-font">{{ report.review_checks }}</h2>
+                <span class="small text-secondary">Partial match / ambiguity</span>
             </div>
         </div>
     </div>
     <div class="col-md-3 mb-4">
-        <div class="card h-100 shadow-sm border-start border-4 border-danger">
-            <div class="card-body">
-                <span class="text-uppercase text-muted small fw-bold">Missing Checks</span>
-                <h2 class="display-6 fw-bold mb-1 text-danger">{{ report.missing_checks }}</h2>
-                <span class="small text-muted">High carrier rejection risk</span>
+        <div class="card h-100 metric-card missing shadow-sm">
+            <div class="card-body ps-4">
+                <span class="text-uppercase text-secondary small fw-bold">Missing Checks</span>
+                <h2 class="display-6 fw-bold mb-1 text-danger brand-font">{{ report.missing_checks }}</h2>
+                <span class="small text-secondary">High carrier rejection risk</span>
             </div>
         </div>
     </div>
@@ -68,36 +68,38 @@
     <!-- Scanned URLs Banner -->
     <div class="col-12 mb-4">
         <div class="card shadow-sm">
-            <div class="card-body">
-                <h6 class="fw-bold mb-3 text-secondary"><i class="bi bi-globe me-1"></i> Scanned Web Pages:</h6>
-                <div class="row g-2">
+            <div class="card-body p-4">
+                <h6 class="fw-bold mb-3 text-secondary d-flex align-items-center gap-2">
+                    <i class="bi bi-globe text-primary"></i> Evaluated URLs
+                </h6>
+                <div class="row g-3">
                     <div class="col-md-6">
-                        <div class="p-2 border rounded bg-light">
-                            <span class="fw-semibold small d-block text-muted">Privacy Policy:</span>
+                        <div class="p-3 border rounded-3 bg-body-tertiary">
+                            <span class="fw-semibold small d-block text-secondary mb-1">Privacy Policy URL:</span>
                             {% if report.privacy_url %}
-                                <a href="{{ report.privacy_url }}" target="_blank" class="text-truncate d-block small">
+                                <a href="{{ report.privacy_url }}" target="_blank" class="text-truncate d-block text-primary text-decoration-none fw-medium small">
                                     <i class="bi bi-box-arrow-up-right me-1"></i>{{ report.privacy_url }}
                                 </a>
                                 {% if report.pp_fetch_status == "FAILED" %}
                                     <span class="badge bg-danger mt-1">Fetch Error: {{ report.pp_error_message }}</span>
                                 {% endif %}
                             {% else %}
-                                <span class="text-muted small">Not provided for this scan</span>
+                                <span class="text-secondary small">Not provided for this scan</span>
                             {% endif %}
                         </div>
                     </div>
                     <div class="col-md-6">
-                        <div class="p-2 border rounded bg-light">
-                            <span class="fw-semibold small d-block text-muted">Terms of Service:</span>
+                        <div class="p-3 border rounded-3 bg-body-tertiary">
+                            <span class="fw-semibold small d-block text-secondary mb-1">Terms of Service URL:</span>
                             {% if report.tos_url %}
-                                <a href="{{ report.tos_url }}" target="_blank" class="text-truncate d-block small">
+                                <a href="{{ report.tos_url }}" target="_blank" class="text-truncate d-block text-primary text-decoration-none fw-medium small">
                                     <i class="bi bi-box-arrow-up-right me-1"></i>{{ report.tos_url }}
                                 </a>
                                 {% if report.tos_fetch_status == "FAILED" %}
                                     <span class="badge bg-danger mt-1">Fetch Error: {{ report.tos_error_message }}</span>
                                 {% endif %}
                             {% else %}
-                                <span class="text-muted small">Not provided for this scan</span>
+                                <span class="text-secondary small">Not provided for this scan</span>
                             {% endif %}
                         </div>
                     </div>
@@ -110,15 +112,15 @@
     {% if pp_results %}
     <div class="col-12 mb-4">
         <div class="card shadow-sm">
-            <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
-                <span class="fs-5 fw-bold text-dark">
-                    <i class="bi bi-lock-fill text-primary me-2"></i>Privacy Policy Compliance
+            <div class="card-header py-3 d-flex justify-content-between align-items-center">
+                <span class="fs-5 fw-bold brand-font d-flex align-items-center gap-2">
+                    <i class="bi bi-lock-fill text-primary"></i>Privacy Policy Compliance
                 </span>
-                <span class="badge bg-secondary">{{ pp_results.count }} Checks</span>
+                <span class="badge hero-pill">{{ pp_results.count }} Checks</span>
             </div>
             <div class="table-responsive">
                 <table class="table table-hover align-middle mb-0">
-                    <thead class="table-light">
+                    <thead class="table-light small">
                         <tr>
                             <th style="width: 10%;">ID</th>
                             <th style="width: 25%;">Requirement</th>
@@ -132,7 +134,7 @@
                             <td><code>{{ item.rule_id }}</code></td>
                             <td>
                                 <strong>{{ item.requirement_title }}</strong>
-                                <p class="text-muted small mb-0">{{ item.description }}</p>
+                                <p class="text-secondary small mb-0">{{ item.description }}</p>
                             </td>
                             <td>
                                 {% if item.status == "PASS" %}
@@ -149,7 +151,7 @@
                                         <i class="bi bi-quote me-1 text-primary"></i>"{{ item.evidence_snippet }}"
                                     </div>
                                 {% endif %}
-                                <small class="text-muted d-block">{{ item.explanation }}</small>
+                                <small class="text-secondary d-block">{{ item.explanation }}</small>
                             </td>
                         </tr>
                         {% endfor %}
@@ -164,15 +166,15 @@
     {% if tos_results %}
     <div class="col-12 mb-4">
         <div class="card shadow-sm">
-            <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
-                <span class="fs-5 fw-bold text-dark">
-                    <i class="bi bi-file-text-fill text-primary me-2"></i>Terms of Service Compliance
+            <div class="card-header py-3 d-flex justify-content-between align-items-center">
+                <span class="fs-5 fw-bold brand-font d-flex align-items-center gap-2">
+                    <i class="bi bi-file-text-fill text-primary"></i>Terms of Service Compliance
                 </span>
-                <span class="badge bg-secondary">{{ tos_results.count }} Checks</span>
+                <span class="badge hero-pill">{{ tos_results.count }} Checks</span>
             </div>
             <div class="table-responsive">
                 <table class="table table-hover align-middle mb-0">
-                    <thead class="table-light">
+                    <thead class="table-light small">
                         <tr>
                             <th style="width: 10%;">ID</th>
                             <th style="width: 25%;">Requirement</th>
@@ -186,7 +188,7 @@
                             <td><code>{{ item.rule_id }}</code></td>
                             <td>
                                 <strong>{{ item.requirement_title }}</strong>
-                                <p class="text-muted small mb-0">{{ item.description }}</p>
+                                <p class="text-secondary small mb-0">{{ item.description }}</p>
                             </td>
                             <td>
                                 {% if item.status == "PASS" %}
@@ -203,7 +205,7 @@
                                         <i class="bi bi-quote me-1 text-primary"></i>"{{ item.evidence_snippet }}"
                                     </div>
                                 {% endif %}
-                                <small class="text-muted d-block">{{ item.explanation }}</small>
+                                <small class="text-secondary d-block">{{ item.explanation }}</small>
                             </td>
                         </tr>
                         {% endfor %}

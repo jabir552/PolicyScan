@@ -5,58 +5,66 @@
 {% block content %}
 <div class="row justify-content-center">
     <div class="col-lg-9">
-        <!-- Hero header -->
+        <!-- Hero Header -->
         <div class="text-center mb-4">
-            <span class="badge bg-primary-subtle text-primary border border-primary-subtle px-3 py-2 rounded-pill mb-2">
-                <i class="bi bi-shield-lock-fill me-1"></i> Carrier & Twilio Standard Verification
+            <span class="hero-pill badge px-3 py-2 rounded-pill mb-2 d-inline-flex align-items-center gap-1 shadow-sm">
+                <i class="bi bi-shield-lock-fill text-primary"></i> Carrier & Twilio Standard Verification
             </span>
-            <h2 class="fw-bold tracking-tight text-dark">PolicyScan</h2>
-            <p class="text-secondary max-w-xl mx-auto">
-                Scan customer Privacy Policies and Terms of Service against A2P 10DLC requirements to ensure fast campaign approval and avoid compliance rejections.
+            <h1 class="display-6 fw-bold tracking-tight mb-2">PolicyScan</h1>
+            <p class="text-secondary max-w-xl mx-auto fs-6">
+                Scan customer Privacy Policies and Terms of Service against A2P 10DLC carrier requirements to ensure fast campaign approval and eliminate rejection risks.
             </p>
         </div>
 
         <!-- Scan Form Card -->
         <div class="card shadow-sm mb-4">
-            <div class="card-body p-4">
+            <div class="card-body p-4 p-md-5">
                 <form method="POST" action="{% url 'run_scan' %}" id="scanForm">
                     {% csrf_token %}
 
+                    <!-- Privacy Policy Input -->
                     <div class="mb-4">
                         <label for="privacy_url" class="form-label fw-semibold d-flex justify-content-between align-items-center">
-                            <span><i class="bi bi-lock-fill text-primary me-1"></i> Privacy Policy URL</span>
-                            <span class="text-muted small fw-normal">Evaluates mobile opt-in non-sharing & data disclosures</span>
+                            <span class="d-flex align-items-center gap-2">
+                                <i class="bi bi-lock-fill text-primary"></i>
+                                <span>Privacy Policy URL</span>
+                            </span>
+                            <span class="text-secondary small fw-normal">Evaluates mobile non-sharing disclosures</span>
                         </label>
-                        <div class="input-group">
-                            <span class="input-group-text bg-light"><i class="bi bi-link-45deg"></i></span>
-                            <input type="url" name="privacy_url" id="privacy_url" class="form-control form-control-lg"
+                        <div class="input-group input-group-lg">
+                            <span class="input-group-text"><i class="bi bi-link-45deg"></i></span>
+                            <input type="url" name="privacy_url" id="privacy_url" class="form-control"
                                    placeholder="https://example.com/privacy-policy" value="">
                         </div>
-                        <div class="form-text">
-                            Example: <code>https://example.com/privacy</code>. Checks for mobile data non-sharing safe-harbor clauses.
+                        <div class="form-text text-secondary mt-2">
+                            Checks data collection and non-sharing disclosures for mobile and text-messaging data.
                         </div>
                     </div>
 
+                    <!-- Terms of Service Input -->
                     <div class="mb-4">
                         <label for="tos_url" class="form-label fw-semibold d-flex justify-content-between align-items-center">
-                            <span><i class="bi bi-file-text-fill text-primary me-1"></i> Terms of Service / Conditions URL</span>
-                            <span class="text-muted small fw-normal">Evaluates STOP/HELP bolding, frequency, carrier disclaimer, etc.</span>
+                            <span class="d-flex align-items-center gap-2">
+                                <i class="bi bi-file-text-fill text-primary"></i>
+                                <span>Terms of Service URL</span>
+                            </span>
+                            <span class="text-secondary small fw-normal">Evaluates STOP, HELP, frequency & carrier disclaimer</span>
                         </label>
-                        <div class="input-group">
-                            <span class="input-group-text bg-light"><i class="bi bi-link-45deg"></i></span>
-                            <input type="url" name="tos_url" id="tos_url" class="form-control form-control-lg"
+                        <div class="input-group input-group-lg">
+                            <span class="input-group-text"><i class="bi bi-link-45deg"></i></span>
+                            <input type="url" name="tos_url" id="tos_url" class="form-control"
                                    placeholder="https://example.com/terms-and-conditions" value="">
                         </div>
-                        <div class="form-text">
-                            Example: <code>https://example.com/terms</code>. Checks brand name, frequency, rates, <strong>STOP</strong>/<strong>HELP</strong>, carrier disclaimer.
+                        <div class="form-text text-secondary mt-2">
+                            Checks brand identity, program description, message rates, frequency, <strong>STOP</strong> / <strong>HELP</strong> instructions, and carrier non-liability.
                         </div>
                     </div>
 
-                    <!-- Quick pre-fill buttons for test convenience -->
-                    <div class="p-3 bg-light rounded-3 border mb-4">
+                    <!-- Quick Sample Demos Bar -->
+                    <div class="p-3 rounded-3 border mb-4 bg-body-tertiary">
                         <div class="d-flex flex-wrap align-items-center justify-content-between gap-2">
-                            <span class="small fw-semibold text-secondary">
-                                <i class="bi bi-lightning-charge-fill text-warning me-1"></i> Quick Test Demos:
+                            <span class="small fw-semibold text-secondary d-flex align-items-center gap-1">
+                                <i class="bi bi-lightning-charge-fill text-warning"></i> Quick Test Demos:
                             </span>
                             <div class="btn-group btn-group-sm">
                                 <button type="button" class="btn btn-outline-secondary" onclick="prefillSample('compliant')">
@@ -72,8 +80,9 @@
                         </div>
                     </div>
 
+                    <!-- Submit Button -->
                     <div class="d-grid">
-                        <button type="submit" class="btn btn-primary btn-lg fw-semibold d-flex align-items-center justify-content-center gap-2" id="submitBtn">
+                        <button type="submit" class="btn btn-brand-primary btn-lg d-flex align-items-center justify-content-center gap-2" id="submitBtn">
                             <i class="bi bi-search"></i>
                             <span id="btnText">Check Compliance</span>
                             <div class="spinner-border spinner-border-sm d-none" id="scanSpinner" role="status">
@@ -88,9 +97,11 @@
         <!-- Recent Scans Card -->
         {% if recent_reports %}
         <div class="card shadow-sm">
-            <div class="card-header d-flex justify-content-between align-items-center">
-                <span><i class="bi bi-clock-history me-1 text-primary"></i> Recent Scans</span>
-                <a href="{% url 'history' %}" class="small text-decoration-none">View All History &rarr;</a>
+            <div class="card-header py-3 d-flex justify-content-between align-items-center">
+                <span class="fw-semibold d-flex align-items-center gap-2">
+                    <i class="bi bi-clock-history text-primary"></i> Recent Audits
+                </span>
+                <a href="{% url 'history' %}" class="small text-decoration-none fw-semibold">View All History &rarr;</a>
             </div>
             <div class="table-responsive">
                 <table class="table table-hover align-middle mb-0">
@@ -99,7 +110,7 @@
                             <th>Scan ID</th>
                             <th>Date & Time</th>
                             <th>Checks Breakdown</th>
-                            <th>Status Summary</th>
+                            <th>Progress</th>
                             <th class="text-end">Action</th>
                         </tr>
                     </thead>
@@ -107,13 +118,13 @@
                         {% for rep in recent_reports %}
                         <tr>
                             <td><strong>#{{ rep.id }}</strong></td>
-                            <td class="small text-muted">{{ rep.created_at|date:"M d, Y H:i" }}</td>
+                            <td class="small text-secondary">{{ rep.created_at|date:"M d, Y H:i" }}</td>
                             <td>
-                                <span class="badge badge-pass me-1"><i class="bi bi-check-circle me-1"></i>{{ rep.passed_checks }} PASS</span>
+                                <span class="badge badge-pass me-1 px-2 py-1"><i class="bi bi-check-circle me-1"></i>{{ rep.passed_checks }} PASS</span>
                                 {% if rep.review_checks %}
-                                    <span class="badge badge-review me-1"><i class="bi bi-exclamation-triangle me-1"></i>{{ rep.review_checks }} REVIEW</span>
+                                    <span class="badge badge-review me-1 px-2 py-1"><i class="bi bi-exclamation-triangle me-1"></i>{{ rep.review_checks }}</span>
                                 {% endif %}
-                                <span class="badge badge-missing"><i class="bi bi-x-circle me-1"></i>{{ rep.missing_checks }} MISSING</span>
+                                <span class="badge badge-missing px-2 py-1"><i class="bi bi-x-circle me-1"></i>{{ rep.missing_checks }} MISSING</span>
                             </td>
                             <td>
                                 <div class="progress" style="height: 6px; width: 110px;">
@@ -124,7 +135,7 @@
                                 </div>
                             </td>
                             <td class="text-end">
-                                <a href="{% url 'report_detail' rep.id %}" class="btn btn-sm btn-outline-primary">
+                                <a href="{% url 'report_detail' rep.id %}" class="btn btn-sm btn-outline-primary fw-medium">
                                     View Report
                                 </a>
                             </td>
@@ -163,7 +174,7 @@
         const btnText = document.getElementById('btnText');
         btn.classList.add('disabled');
         spinner.classList.remove('d-none');
-        btnText.textContent = 'Fetching & Inspecting Pages...';
+        btnText.textContent = 'Analyzing Compliance Policies...';
     });
 </script>
 {% endblock %}

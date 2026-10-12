@@ -1,16 +1,18 @@
 {% extends "checker/base.html" %}
 
-{% block title %}Scan History - A2P 10DLC Compliance Checker{% endblock %}
+{% block title %}Scan History - PolicyScan{% endblock %}
 
 {% block content %}
 <div class="row">
-    <div class="col-12 mb-4 d-flex justify-content-between align-items-center">
+    <div class="col-12 mb-4 d-flex flex-wrap justify-content-between align-items-center gap-3">
         <div>
-            <h2 class="fw-bold mb-1"><i class="bi bi-clock-history text-primary me-2"></i>Audit Scan History</h2>
-            <p class="text-muted mb-0">Browse and download past policy compliance evaluations stored in SQLite.</p>
+            <h2 class="fw-bold mb-1 brand-font d-flex align-items-center gap-2">
+                <i class="bi bi-clock-history text-primary"></i>Audit Scan History
+            </h2>
+            <p class="text-secondary mb-0">Browse and export previous compliance audit records stored in SQLite.</p>
         </div>
-        <a href="{% url 'index' %}" class="btn btn-primary">
-            <i class="bi bi-plus-circle me-1"></i> New Compliance Scan
+        <a href="{% url 'index' %}" class="btn btn-brand-primary d-inline-flex align-items-center gap-2">
+            <i class="bi bi-plus-circle"></i> New Compliance Scan
         </a>
     </div>
 
@@ -18,13 +20,13 @@
         <div class="card shadow-sm">
             <div class="table-responsive">
                 <table class="table table-hover align-middle mb-0">
-                    <thead class="table-light">
+                    <thead class="table-light small">
                         <tr>
                             <th>Scan ID</th>
                             <th>Timestamp</th>
                             <th>Target URLs</th>
                             <th>Score / Breakdown</th>
-                            <th>Status Bar</th>
+                            <th>Progress</th>
                             <th class="text-end">Actions</th>
                         </tr>
                     </thead>
@@ -32,27 +34,27 @@
                         {% for rep in reports %}
                         <tr>
                             <td><strong>#{{ rep.id }}</strong></td>
-                            <td class="text-muted small">{{ rep.created_at|date:"M d, Y H:i:s" }}</td>
+                            <td class="text-secondary small">{{ rep.created_at|date:"M d, Y H:i:s" }}</td>
                             <td>
                                 {% if rep.privacy_url %}
-                                    <div class="text-truncate" style="max-width: 260px;">
-                                        <i class="bi bi-lock-fill text-secondary small"></i>
+                                    <div class="text-truncate" style="max-width: 280px;">
+                                        <i class="bi bi-lock-fill text-primary small"></i>
                                         <span class="small">{{ rep.privacy_url }}</span>
                                     </div>
                                 {% endif %}
                                 {% if rep.tos_url %}
-                                    <div class="text-truncate" style="max-width: 260px;">
-                                        <i class="bi bi-file-text-fill text-secondary small"></i>
+                                    <div class="text-truncate" style="max-width: 280px;">
+                                        <i class="bi bi-file-text-fill text-primary small"></i>
                                         <span class="small">{{ rep.tos_url }}</span>
                                     </div>
                                 {% endif %}
                             </td>
                             <td>
-                                <span class="badge badge-pass"><i class="bi bi-check-circle me-1"></i>{{ rep.passed_checks }} PASS</span>
+                                <span class="badge badge-pass px-2 py-1"><i class="bi bi-check-circle me-1"></i>{{ rep.passed_checks }} PASS</span>
                                 {% if rep.review_checks %}
-                                    <span class="badge badge-review"><i class="bi bi-exclamation-triangle me-1"></i>{{ rep.review_checks }}</span>
+                                    <span class="badge badge-review px-2 py-1"><i class="bi bi-exclamation-triangle me-1"></i>{{ rep.review_checks }}</span>
                                 {% endif %}
-                                <span class="badge badge-missing"><i class="bi bi-x-circle me-1"></i>{{ rep.missing_checks }} MISSING</span>
+                                <span class="badge badge-missing px-2 py-1"><i class="bi bi-x-circle me-1"></i>{{ rep.missing_checks }} MISSING</span>
                             </td>
                             <td>
                                 <div class="progress" style="height: 6px; width: 90px;">
@@ -63,20 +65,20 @@
                                 </div>
                             </td>
                             <td class="text-end">
-                                <a href="{% url 'report_detail' rep.id %}" class="btn btn-sm btn-outline-primary me-1">
+                                <a href="{% url 'report_detail' rep.id %}" class="btn btn-sm btn-outline-primary me-1 fw-medium">
                                     View
                                 </a>
-                                <a href="{% url 'export_csv' rep.id %}" class="btn btn-sm btn-outline-success" title="Download CSV">
+                                <a href="{% url 'export_csv' rep.id %}" class="btn btn-sm btn-outline-success fw-medium" title="Download CSV">
                                     <i class="bi bi-download"></i> CSV
                                 </a>
                             </td>
                         </tr>
                         {% empty %}
                         <tr>
-                            <td colspan="6" class="text-center py-5 text-muted">
-                                <i class="bi bi-inbox fs-1 d-block mb-2 text-secondary"></i>
+                            <td colspan="6" class="text-center py-5 text-secondary">
+                                <i class="bi bi-inbox fs-1 d-block mb-2 text-secondary opacity-50"></i>
                                 No compliance scans recorded yet. <br>
-                                <a href="{% url 'index' %}" class="btn btn-primary btn-sm mt-3">Start First Scan</a>
+                                <a href="{% url 'index' %}" class="btn btn-brand-primary btn-sm mt-3">Start First Scan</a>
                             </td>
                         </tr>
                         {% endfor %}

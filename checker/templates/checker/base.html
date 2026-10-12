@@ -1,91 +1,350 @@
 {% load static %}
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-bs-theme="light">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}PolicyScan - Compliance Checker{% endblock %}</title>
     <link rel="icon" type="image/png" href="{% static 'checker/logo.png' %}">
+    
+    <!-- Google Fonts: Inter & Outfit -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    
     <!-- Bootstrap 5 CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- Bootstrap Icons -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    
     <style>
+        /* ==========================================================================
+           VoiceStack Design System Tokens
+           ========================================================================== */
         :root {
-            --bs-primary-rgb: 13, 110, 253;
-            --brand-dark: #0f172a;
-            --card-border: #e2e8f0;
+            /* VoiceStack Core Brand Palette */
+            --color-brand-600: #2563eb;
+            --color-brand-500: #3b82f6;
+            --color-brand-400: #60a5fa;
+            --color-brand-300: #93c5fd;
+            --color-brand-200: #bfdbfe;
+            --color-brand-100: #dbeafe;
+            --color-brand-50:  #eff6ff;
+
+            /* Interactive Tokens */
+            --interactive-100: var(--color-brand-600);
+            --interactive-80: var(--color-brand-500);
+            --interactive-60: var(--color-brand-400);
+            --interactive-20: var(--color-brand-200);
+            --interactive-10: var(--color-brand-100);
+            --interactive-5: var(--color-brand-50);
+
+            /* Grayscale Neutral Palette */
+            --grayscale-100: #0d161d;
+            --grayscale-80: #354756;
+            --grayscale-60: #5d6f7e;
+            --grayscale-40: #96a3af;
+            --grayscale-20: #d9dfe7;
+            --grayscale-10: #eceff2;
+            --grayscale-5: #f7f8fa;
+            --grayscale-0: #ffffff;
+
+            /* Accent Blue Tokens */
+            --accent-blue-100: #2a57a6;
+            --accent-blue-80: #3f71c8;
+            --accent-blue-60: #78a3ef;
+            --accent-blue-40: #a1c1fc;
+            --accent-blue-20: #bcd5ff;
+            --accent-blue-10: #d5e3fb;
+            --accent-blue-5: #f1f6ff;
+
+            /* Semantic Feedback Tokens */
+            --indicator-danger-100: #991b1b;
+            --indicator-danger-80: #dc2626;
+            --indicator-danger-20: #fecaca;
+            --indicator-danger-5: #fef2f2;
+
+            --indicator-warning-100: #92400e;
+            --indicator-warning-80: #f59e0b;
+            --indicator-warning-20: #fde68a;
+            --indicator-warning-5: #fffbeb;
+
+            --indicator-success-100: #14532d;
+            --indicator-success-80: #16a34a;
+            --indicator-success-20: #bbf7d0;
+            --indicator-success-5: #f0fdf4;
+
+            /* Theme Surface Bindings (Light Default) */
+            --bg-body: #f8fafc;
+            --bg-surface: #ffffff;
+            --bg-surface-elevated: #ffffff;
+            --bg-subtle: #f1f5f9;
+            --text-primary: var(--grayscale-100);
+            --text-secondary: var(--grayscale-60);
+            --text-muted: var(--grayscale-40);
+            --border-color: #e2e8f0;
+            --nav-bg: #0d161d;
+            --nav-border: #1e293b;
+            --card-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
+            --card-hover-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.08), 0 4px 6px -4px rgba(0, 0, 0, 0.04);
+            --code-bg: #f8fafc;
         }
+
+        /* Dark Mode Color Mappings */
+        [data-bs-theme="dark"] {
+            --bg-body: #090e13;
+            --bg-surface: #111a22;
+            --bg-surface-elevated: #16222c;
+            --bg-subtle: #192734;
+            --text-primary: #f1f5f9;
+            --text-secondary: #94a3b8;
+            --text-muted: #64748b;
+            --border-color: #1e2e3d;
+            --nav-bg: #090e13;
+            --nav-border: #1e2e3d;
+            --card-shadow: 0 4px 12px 0 rgba(0, 0, 0, 0.4);
+            --card-hover-shadow: 0 8px 24px 0 rgba(0, 0, 0, 0.6);
+            --code-bg: #0e1720;
+
+            --indicator-success-5: rgba(22, 163, 74, 0.12);
+            --indicator-warning-5: rgba(245, 158, 11, 0.12);
+            --indicator-danger-5: rgba(220, 38, 38, 0.12);
+            --interactive-5: rgba(59, 130, 246, 0.12);
+        }
+
+        /* ==========================================================================
+           Base & Typography
+           ========================================================================== */
         body {
-            background-color: #f8fafc;
-            color: #334155;
-            font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+            background-color: var(--bg-body);
+            color: var(--text-primary);
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
             min-height: 100vh;
             display: flex;
             flex-direction: column;
+            transition: background-color 0.25s ease, color 0.25s ease;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        h1, h2, h3, h4, h5, h6, .brand-font {
+            font-family: 'Outfit', sans-serif;
+            color: var(--text-primary);
+        }
+
+        /* ==========================================================================
+           Navbar & Header
+           ========================================================================== */
+        .app-navbar {
+            background-color: var(--nav-bg) !important;
+            border-bottom: 1px solid var(--nav-border);
+            backdrop-filter: blur(12px);
+            z-index: 1030;
         }
         .navbar-brand {
             font-weight: 700;
-            letter-spacing: -0.5px;
+            letter-spacing: -0.02em;
         }
+        .logo-wrapper {
+            background: #ffffff;
+            padding: 4px 10px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            display: inline-flex;
+            align-items: center;
+        }
+        .nav-link {
+            color: #94a3b8 !important;
+            font-weight: 500;
+            font-size: 0.92rem;
+            transition: all 0.2s ease;
+            border-radius: 8px;
+            margin: 0 2px;
+        }
+        .nav-link:hover {
+            color: #ffffff !important;
+            background-color: rgba(255, 255, 255, 0.08);
+        }
+
+        /* Theme Toggle Button */
+        .theme-toggle-btn {
+            background: transparent;
+            border: 1px solid var(--border-color);
+            color: var(--text-primary);
+            width: 38px;
+            height: 38px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .theme-toggle-btn:hover {
+            background-color: var(--bg-subtle);
+            transform: scale(1.05);
+        }
+
+        /* ==========================================================================
+           Card & Surface Elements
+           ========================================================================== */
         .card {
-            border: 1px solid var(--card-border);
-            border-radius: 12px;
-            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05), 0 1px 2px -1px rgba(0, 0, 0, 0.05);
+            background-color: var(--bg-surface);
+            border: 1px solid var(--border-color);
+            border-radius: 14px;
+            box-shadow: var(--card-shadow);
+            transition: box-shadow 0.25s ease, transform 0.25s ease, border-color 0.25s ease;
         }
         .card-header {
-            background-color: #ffffff;
-            border-bottom: 1px solid var(--card-border);
+            background-color: var(--bg-surface);
+            border-bottom: 1px solid var(--border-color);
             font-weight: 600;
         }
+
+        /* Hero Pill Badge */
+        .hero-pill {
+            background-color: var(--interactive-5);
+            color: var(--color-brand-600);
+            border: 1px solid var(--interactive-20);
+            font-weight: 600;
+            font-size: 0.82rem;
+            letter-spacing: 0.02em;
+        }
+        [data-bs-theme="dark"] .hero-pill {
+            color: var(--color-brand-400);
+        }
+
+        /* Metric Highlights */
+        .metric-card {
+            position: relative;
+            overflow: hidden;
+            border-radius: 14px;
+        }
+        .metric-card::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 4px;
+        }
+        .metric-card.score::before { background: var(--color-brand-500); }
+        .metric-card.pass::before  { background: var(--indicator-success-80); }
+        .metric-card.review::before{ background: var(--indicator-warning-80); }
+        .metric-card.missing::before{ background: var(--indicator-danger-80); }
+
+        /* Form Inputs */
+        .form-control {
+            background-color: var(--bg-surface);
+            border-color: var(--border-color);
+            color: var(--text-primary);
+            border-radius: 10px;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+        .form-control:focus {
+            background-color: var(--bg-surface);
+            border-color: var(--color-brand-500);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+            color: var(--text-primary);
+        }
+        .input-group-text {
+            background-color: var(--bg-subtle);
+            border-color: var(--border-color);
+            color: var(--text-secondary);
+            border-radius: 10px 0 0 10px;
+        }
+
+        /* Action Buttons */
+        .btn-brand-primary {
+            background: linear-gradient(135deg, var(--color-brand-600), var(--accent-blue-100));
+            border: none;
+            color: #ffffff;
+            font-weight: 600;
+            border-radius: 10px;
+            padding: 12px 24px;
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.25);
+            transition: all 0.2s ease;
+        }
+        .btn-brand-primary:hover {
+            background: linear-gradient(135deg, var(--interactive-80), var(--accent-blue-80));
+            color: #ffffff;
+            transform: translateY(-1px);
+            box-shadow: 0 6px 16px rgba(37, 99, 235, 0.35);
+        }
+
+        /* Status Badges */
         .badge-pass {
-            background-color: #dcfce7;
-            color: #15803d;
-            border: 1px solid #bbf7d0;
+            background-color: var(--indicator-success-5);
+            color: var(--indicator-success-80);
+            border: 1px solid var(--indicator-success-20);
+            font-weight: 600;
         }
         .badge-missing {
-            background-color: #fee2e2;
-            color: #b91c1c;
-            border: 1px solid #fecaca;
+            background-color: var(--indicator-danger-5);
+            color: var(--indicator-danger-80);
+            border: 1px solid var(--indicator-danger-20);
+            font-weight: 600;
         }
         .badge-review {
-            background-color: #fef3c7;
-            color: #b45309;
-            border: 1px solid #fde68a;
+            background-color: var(--indicator-warning-5);
+            color: var(--indicator-warning-80);
+            border: 1px solid var(--indicator-warning-20);
+            font-weight: 600;
         }
+
+        /* Evidence Code Snippet Box */
         .snippet-box {
-            background-color: #f1f5f9;
-            border-left: 4px solid #0284c7;
+            background-color: var(--code-bg);
+            border-left: 3px solid var(--color-brand-500);
+            border-radius: 8px;
             padding: 10px 14px;
-            border-radius: 4px;
-            font-size: 0.88rem;
-            color: #1e293b;
-            font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+            font-family: 'JetBrains Mono', ui-monospace, monospace;
+            font-size: 0.85rem;
+            color: var(--text-primary);
+            border: 1px solid var(--border-color);
+            border-left: 3.5px solid var(--color-brand-500);
         }
+
+        /* Footer */
         footer {
             margin-top: auto;
-            border-top: 1px solid var(--card-border);
-            background-color: #ffffff;
+            border-top: 1px solid var(--border-color);
+            background-color: var(--bg-surface);
+            transition: all 0.25s ease;
         }
+
+        /* Subtle scrollbars */
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: var(--bg-body); }
+        ::-webkit-scrollbar-thumb { background: var(--grayscale-20); border-radius: 4px; }
+        [data-bs-theme="dark"] ::-webkit-scrollbar-thumb { background: var(--grayscale-80); }
     </style>
     {% block extra_head %}{% endblock %}
 </head>
 <body>
     <!-- Top Navigation -->
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top shadow-sm">
+    <nav class="navbar navbar-expand-lg app-navbar sticky-top shadow-sm py-2">
         <div class="container">
             <a class="navbar-brand d-flex align-items-center gap-2" href="{% url 'index' %}">
-                <span class="bg-white px-2 py-1 rounded d-flex align-items-center shadow-sm">
-                    <img src="{% static 'checker/logo.png' %}" alt="VoiceStack Logo" height="28" class="d-inline-block align-text-top">
+                <span class="logo-wrapper">
+                    <img src="{% static 'checker/logo.png' %}" alt="VoiceStack Logo" height="26" class="d-inline-block">
                 </span>
                 <span class="text-white-50 fs-6 fw-normal mx-1">|</span>
-                <span class="fw-semibold tracking-tight text-white">PolicyScan</span>
+                <span class="brand-font text-white fw-bold fs-5 tracking-tight">PolicyScan</span>
             </a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navMenu">
-                <span class="navbar-toggler-icon"></span>
-            </button>
+
+            <div class="d-flex align-items-center gap-2 ms-auto order-lg-last">
+                <!-- Dark / Light Theme Toggle -->
+                <button type="button" class="theme-toggle-btn" id="themeToggleBtn" title="Toggle Dark/Light Mode" aria-label="Toggle theme">
+                    <i class="bi bi-moon-stars-fill text-warning" id="themeIcon"></i>
+                </button>
+
+                <button class="navbar-toggler text-white border-0 p-2" type="button" data-bs-toggle="collapse" data-bs-target="#navMenu">
+                    <i class="bi bi-list fs-3"></i>
+                </button>
+            </div>
+
             <div class="collapse navbar-collapse" id="navMenu">
-                <ul class="navbar-nav ms-auto align-items-center gap-1">
+                <ul class="navbar-nav ms-auto align-items-center gap-1 my-2 my-lg-0">
                     <li class="nav-item">
                         <a class="nav-link px-3" href="{% url 'index' %}"><i class="bi bi-search me-1"></i> New Scan</a>
                     </li>
@@ -106,7 +365,7 @@
     <main class="container py-4 flex-grow-1">
         {% if messages %}
             {% for msg in messages %}
-                <div class="alert alert-{{ msg.tags|default:'info' }} alert-dismissible fade show shadow-sm" role="alert">
+                <div class="alert alert-{{ msg.tags|default:'info' }} alert-dismissible fade show shadow-sm rounded-3 border" role="alert">
                     {{ msg }}
                     <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                 </div>
@@ -117,16 +376,51 @@
     </main>
 
     <!-- Footer -->
-    <footer class="py-3 text-muted text-center text-sm">
+    <footer class="py-3 text-center text-sm">
         <div class="container">
-            <p class="mb-0 small">
-                PolicyScan &bull; A2P 10DLC Policy Compliance Engine
+            <p class="mb-0 small text-secondary">
+                <strong class="text-primary">PolicyScan</strong> &bull; A2P 10DLC Policy Compliance Engine
             </p>
         </div>
     </footer>
 
     <!-- Bootstrap 5 JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Theme Toggle Persistence Script -->
+    <script>
+        (function() {
+            const themeToggleBtn = document.getElementById('themeToggleBtn');
+            const themeIcon = document.getElementById('themeIcon');
+            const htmlElement = document.documentElement;
+
+            // Load saved preference or system preference
+            const savedTheme = localStorage.getItem('voiceStack_theme');
+            const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+            const activeTheme = savedTheme ? savedTheme : (prefersDark ? 'dark' : 'light');
+
+            function applyTheme(theme) {
+                htmlElement.setAttribute('data-bs-theme', theme);
+                if (theme === 'dark') {
+                    themeIcon.className = 'bi bi-sun-fill text-warning';
+                    themeToggleBtn.setAttribute('title', 'Switch to Light Mode');
+                } else {
+                    themeIcon.className = 'bi bi-moon-stars-fill text-primary';
+                    themeToggleBtn.setAttribute('title', 'Switch to Dark Mode');
+                }
+                localStorage.setItem('voiceStack_theme', theme);
+            }
+
+            applyTheme(activeTheme);
+
+            if (themeToggleBtn) {
+                themeToggleBtn.addEventListener('click', function() {
+                    const currentTheme = htmlElement.getAttribute('data-bs-theme');
+                    applyTheme(currentTheme === 'dark' ? 'light' : 'dark');
+                });
+            }
+        })();
+    </script>
     {% block extra_scripts %}{% endblock %}
 </body>
 </html>

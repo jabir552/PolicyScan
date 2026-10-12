@@ -85,17 +85,33 @@ WSGI_APPLICATION = "config.wsgi.application"
 
 
 # Database
-# If DATABASE_URL is set (Supabase PostgreSQL), use it. Otherwise, fall back to SQLite.
-DATABASE_URL = os.getenv("DATABASE_URL")
+# If DATABASE_URL is set (Supabase PostgreSQL), parse it cleanly.
+DATABASE_URL = os.getenv("DATABASE_URL", "").strip()
 
 if DATABASE_URL:
-    DATABASES = {
-        "default": dj_database_url.config(
-            default=DATABASE_URL,
-            conn_max_age=600,
-            conn_health_checks=True,
-        )
-    }
+    try:
+        DATABASES = {
+            "default": dj_database_url.parse(
+                DATABASE_URL,
+                conn_max_age=600,
+                conn_health_checks=True,
+            )
+        }
+    except Exception:
+        # Fallback manual parsing for Supabase URIs with special characters
+        from urllib.parse import urlparse, unquote
+        parsed = urlparse(DATABASE_URL)
+        DATABASES = {
+            "default": {
+                "ENGINE": "django.db.backends.postgresql",
+                "NAME": parsed.path.lstrip("/"),
+                "USER": unquote(parsed.username) if parsed.username else "",
+                "PASSWORD": unquote(parsed.password) if parsed.password else "",
+                "HOST": parsed.hostname,
+                "PORT": parsed.port or 5432,
+                "CONN_MAX_AGE": 600,
+            }
+        }
 else:
     DATABASES = {
         "default": {

@@ -1,0 +1,169 @@
+{% extends "checker/base.html" %}
+
+{% block title %}A2P 10DLC Compliance Checker - New Scan{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-9">
+        <!-- Hero header -->
+        <div class="text-center mb-4">
+            <span class="badge bg-primary-subtle text-primary border border-primary-subtle px-3 py-2 rounded-pill mb-2">
+                <i class="bi bi-shield-lock-fill me-1"></i> Carrier & Twilio Standard Verification
+            </span>
+            <h2 class="fw-bold tracking-tight text-dark">A2P 10DLC Policy Compliance Checker</h2>
+            <p class="text-secondary max-w-xl mx-auto">
+                Scan customer Privacy Policies and Terms of Service against strict carrier & Twilio A2P 10DLC requirements to ensure fast campaign approval and avoid compliance rejections.
+            </p>
+        </div>
+
+        <!-- Scan Form Card -->
+        <div class="card shadow-sm mb-4">
+            <div class="card-body p-4">
+                <form method="POST" action="{% url 'run_scan' %}" id="scanForm">
+                    {% csrf_token %}
+
+                    <div class="mb-4">
+                        <label for="privacy_url" class="form-label fw-semibold d-flex justify-content-between align-items-center">
+                            <span><i class="bi bi-lock-fill text-primary me-1"></i> Privacy Policy URL</span>
+                            <span class="text-muted small fw-normal">Evaluates mobile opt-in non-sharing & data disclosures</span>
+                        </label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-light"><i class="bi bi-link-45deg"></i></span>
+                            <input type="url" name="privacy_url" id="privacy_url" class="form-control form-control-lg"
+                                   placeholder="https://example.com/privacy-policy" value="">
+                        </div>
+                        <div class="form-text">
+                            Example: <code>https://example.com/privacy</code>. Checks for mobile data non-sharing safe-harbor clauses.
+                        </div>
+                    </div>
+
+                    <div class="mb-4">
+                        <label for="tos_url" class="form-label fw-semibold d-flex justify-content-between align-items-center">
+                            <span><i class="bi bi-file-text-fill text-primary me-1"></i> Terms of Service / Conditions URL</span>
+                            <span class="text-muted small fw-normal">Evaluates STOP/HELP bolding, frequency, carrier disclaimer, etc.</span>
+                        </label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-light"><i class="bi bi-link-45deg"></i></span>
+                            <input type="url" name="tos_url" id="tos_url" class="form-control form-control-lg"
+                                   placeholder="https://example.com/terms-and-conditions" value="">
+                        </div>
+                        <div class="form-text">
+                            Example: <code>https://example.com/terms</code>. Checks brand name, frequency, rates, <strong>STOP</strong>/<strong>HELP</strong>, carrier disclaimer.
+                        </div>
+                    </div>
+
+                    <!-- Quick pre-fill buttons for test convenience -->
+                    <div class="p-3 bg-light rounded-3 border mb-4">
+                        <div class="d-flex flex-wrap align-items-center justify-content-between gap-2">
+                            <span class="small fw-semibold text-secondary">
+                                <i class="bi bi-lightning-charge-fill text-warning me-1"></i> Quick Test Demos:
+                            </span>
+                            <div class="btn-group btn-group-sm">
+                                <button type="button" class="btn btn-outline-secondary" onclick="prefillSample('compliant')">
+                                    Load Compliant Sample
+                                </button>
+                                <button type="button" class="btn btn-outline-secondary" onclick="prefillSample('non_compliant')">
+                                    Load Non-Compliant Sample
+                                </button>
+                                <button type="button" class="btn btn-outline-secondary" onclick="clearFields()">
+                                    Clear
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="d-grid">
+                        <button type="submit" class="btn btn-primary btn-lg fw-semibold d-flex align-items-center justify-content-center gap-2" id="submitBtn">
+                            <i class="bi bi-search"></i>
+                            <span id="btnText">Check Compliance</span>
+                            <div class="spinner-border spinner-border-sm d-none" id="scanSpinner" role="status">
+                                <span class="visually-hidden">Loading...</span>
+                            </div>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Recent Scans Card -->
+        {% if recent_reports %}
+        <div class="card shadow-sm">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <span><i class="bi bi-clock-history me-1 text-primary"></i> Recent Scans</span>
+                <a href="{% url 'history' %}" class="small text-decoration-none">View All History &rarr;</a>
+            </div>
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="table-light small">
+                        <tr>
+                            <th>Scan ID</th>
+                            <th>Date & Time</th>
+                            <th>Checks Breakdown</th>
+                            <th>Status Summary</th>
+                            <th class="text-end">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for rep in recent_reports %}
+                        <tr>
+                            <td><strong>#{{ rep.id }}</strong></td>
+                            <td class="small text-muted">{{ rep.created_at|date:"M d, Y H:i" }}</td>
+                            <td>
+                                <span class="badge badge-pass me-1"><i class="bi bi-check-circle me-1"></i>{{ rep.passed_checks }} PASS</span>
+                                {% if rep.review_checks %}
+                                    <span class="badge badge-review me-1"><i class="bi bi-exclamation-triangle me-1"></i>{{ rep.review_checks }} REVIEW</span>
+                                {% endif %}
+                                <span class="badge badge-missing"><i class="bi bi-x-circle me-1"></i>{{ rep.missing_checks }} MISSING</span>
+                            </td>
+                            <td>
+                                <div class="progress" style="height: 6px; width: 110px;">
+                                    <div class="progress-bar bg-success" role="progressbar" 
+                                         style="width: {% widthratio rep.passed_checks rep.total_checks 100 %}%;"></div>
+                                    <div class="progress-bar bg-warning" role="progressbar" 
+                                         style="width: {% widthratio rep.review_checks rep.total_checks 100 %}%;"></div>
+                                </div>
+                            </td>
+                            <td class="text-end">
+                                <a href="{% url 'report_detail' rep.id %}" class="btn btn-sm btn-outline-primary">
+                                    View Report
+                                </a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+    function prefillSample(type) {
+        const origin = window.location.origin;
+        if (type === 'compliant') {
+            document.getElementById('privacy_url').value = origin + '/samples/?type=compliant';
+            document.getElementById('tos_url').value = origin + '/samples/?type=compliant';
+        } else {
+            document.getElementById('privacy_url').value = origin + '/samples/?type=non_compliant';
+            document.getElementById('tos_url').value = origin + '/samples/?type=non_compliant';
+        }
+    }
+
+    function clearFields() {
+        document.getElementById('privacy_url').value = '';
+        document.getElementById('tos_url').value = '';
+    }
+
+    document.getElementById('scanForm').addEventListener('submit', function() {
+        const btn = document.getElementById('submitBtn');
+        const spinner = document.getElementById('scanSpinner');
+        const btnText = document.getElementById('btnText');
+        btn.classList.add('disabled');
+        spinner.classList.remove('d-none');
+        btnText.textContent = 'Fetching & Inspecting Pages...';
+    });
+</script>
+{% endblock %}

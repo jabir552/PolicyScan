@@ -1,0 +1,8 @@
+*.pyc
+__pycache__/
+*.sqlite3
+db.sqlite3-journal
+.env
+.agents/
+.vscode/
+.idea/

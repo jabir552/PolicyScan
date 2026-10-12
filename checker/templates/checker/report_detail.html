@@ -1,0 +1,218 @@
+{% extends "checker/base.html" %}
+
+{% block title %}Report #{{ report.id }} - A2P 10DLC Compliance Audit{% endblock %}
+
+{% block content %}
+<div class="row">
+    <!-- Top Report Summary Bar -->
+    <div class="col-12 mb-4">
+        <div class="d-flex flex-wrap align-items-center justify-content-between gap-3 p-3 bg-white rounded-3 border shadow-sm">
+            <div>
+                <a href="{% url 'index' %}" class="btn btn-sm btn-outline-secondary me-2">
+                    <i class="bi bi-arrow-left me-1"></i> New Scan
+                </a>
+                <span class="fs-4 fw-bold text-dark">Compliance Audit Report #{{ report.id }}</span>
+                <span class="text-muted ms-2 small">({{ report.created_at|date:"F d, Y - H:i:s" }} UTC)</span>
+            </div>
+            <div class="d-flex gap-2">
+                <a href="{% url 'export_csv' report.id %}" class="btn btn-success d-flex align-items-center gap-1">
+                    <i class="bi bi-filetype-csv"></i> Download CSV Report
+                </a>
+                <a href="{% url 'history' %}" class="btn btn-outline-primary">
+                    <i class="bi bi-list-ul"></i> All History
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Overview Metrics Cards -->
+    <div class="col-md-3 mb-4">
+        <div class="card h-100 shadow-sm border-start border-4 border-primary">
+            <div class="card-body">
+                <span class="text-uppercase text-muted small fw-bold">Compliance Score</span>
+                <h2 class="display-6 fw-bold mb-1 text-primary">{{ pass_pct }}%</h2>
+                <div class="progress" style="height: 6px;">
+                    <div class="progress-bar bg-primary" role="progressbar" style="width: {{ pass_pct }}%;"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3 mb-4">
+        <div class="card h-100 shadow-sm border-start border-4 border-success">
+            <div class="card-body">
+                <span class="text-uppercase text-muted small fw-bold">Passed Checks</span>
+                <h2 class="display-6 fw-bold mb-1 text-success">{{ report.passed_checks }}</h2>
+                <span class="small text-muted">Out of {{ report.total_checks }} total checks</span>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3 mb-4">
+        <div class="card h-100 shadow-sm border-start border-4 border-warning">
+            <div class="card-body">
+                <span class="text-uppercase text-muted small fw-bold">Needs Manual Review</span>
+                <h2 class="display-6 fw-bold mb-1 text-warning">{{ report.review_checks }}</h2>
+                <span class="small text-muted">Partial match / ambiguity</span>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3 mb-4">
+        <div class="card h-100 shadow-sm border-start border-4 border-danger">
+            <div class="card-body">
+                <span class="text-uppercase text-muted small fw-bold">Missing Checks</span>
+                <h2 class="display-6 fw-bold mb-1 text-danger">{{ report.missing_checks }}</h2>
+                <span class="small text-muted">High carrier rejection risk</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scanned URLs Banner -->
+    <div class="col-12 mb-4">
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <h6 class="fw-bold mb-3 text-secondary"><i class="bi bi-globe me-1"></i> Scanned Web Pages:</h6>
+                <div class="row g-2">
+                    <div class="col-md-6">
+                        <div class="p-2 border rounded bg-light">
+                            <span class="fw-semibold small d-block text-muted">Privacy Policy:</span>
+                            {% if report.privacy_url %}
+                                <a href="{{ report.privacy_url }}" target="_blank" class="text-truncate d-block small">
+                                    <i class="bi bi-box-arrow-up-right me-1"></i>{{ report.privacy_url }}
+                                </a>
+                                {% if report.pp_fetch_status == "FAILED" %}
+                                    <span class="badge bg-danger mt-1">Fetch Error: {{ report.pp_error_message }}</span>
+                                {% endif %}
+                            {% else %}
+                                <span class="text-muted small">Not provided for this scan</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="p-2 border rounded bg-light">
+                            <span class="fw-semibold small d-block text-muted">Terms of Service:</span>
+                            {% if report.tos_url %}
+                                <a href="{{ report.tos_url }}" target="_blank" class="text-truncate d-block small">
+                                    <i class="bi bi-box-arrow-up-right me-1"></i>{{ report.tos_url }}
+                                </a>
+                                {% if report.tos_fetch_status == "FAILED" %}
+                                    <span class="badge bg-danger mt-1">Fetch Error: {{ report.tos_error_message }}</span>
+                                {% endif %}
+                            {% else %}
+                                <span class="text-muted small">Not provided for this scan</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Privacy Policy Detailed Results Table -->
+    {% if pp_results %}
+    <div class="col-12 mb-4">
+        <div class="card shadow-sm">
+            <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
+                <span class="fs-5 fw-bold text-dark">
+                    <i class="bi bi-lock-fill text-primary me-2"></i>Privacy Policy Compliance
+                </span>
+                <span class="badge bg-secondary">{{ pp_results.count }} Checks</span>
+            </div>
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th style="width: 10%;">ID</th>
+                            <th style="width: 25%;">Requirement</th>
+                            <th style="width: 18%;">Status</th>
+                            <th style="width: 47%;">Evidence Snippet & Explanation</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for item in pp_results %}
+                        <tr>
+                            <td><code>{{ item.rule_id }}</code></td>
+                            <td>
+                                <strong>{{ item.requirement_title }}</strong>
+                                <p class="text-muted small mb-0">{{ item.description }}</p>
+                            </td>
+                            <td>
+                                {% if item.status == "PASS" %}
+                                    <span class="badge badge-pass px-2 py-1"><i class="bi bi-check-circle-fill me-1"></i>PASS</span>
+                                {% elif item.status == "NEEDS MANUAL REVIEW" %}
+                                    <span class="badge badge-review px-2 py-1"><i class="bi bi-exclamation-triangle-fill me-1"></i>NEEDS REVIEW</span>
+                                {% else %}
+                                    <span class="badge badge-missing px-2 py-1"><i class="bi bi-x-circle-fill me-1"></i>MISSING</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if item.evidence_snippet %}
+                                    <div class="snippet-box mb-2">
+                                        <i class="bi bi-quote me-1 text-primary"></i>"{{ item.evidence_snippet }}"
+                                    </div>
+                                {% endif %}
+                                <small class="text-muted d-block">{{ item.explanation }}</small>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Terms of Service Detailed Results Table -->
+    {% if tos_results %}
+    <div class="col-12 mb-4">
+        <div class="card shadow-sm">
+            <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
+                <span class="fs-5 fw-bold text-dark">
+                    <i class="bi bi-file-text-fill text-primary me-2"></i>Terms of Service Compliance
+                </span>
+                <span class="badge bg-secondary">{{ tos_results.count }} Checks</span>
+            </div>
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th style="width: 10%;">ID</th>
+                            <th style="width: 25%;">Requirement</th>
+                            <th style="width: 18%;">Status</th>
+                            <th style="width: 47%;">Evidence Snippet & Explanation</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for item in tos_results %}
+                        <tr>
+                            <td><code>{{ item.rule_id }}</code></td>
+                            <td>
+                                <strong>{{ item.requirement_title }}</strong>
+                                <p class="text-muted small mb-0">{{ item.description }}</p>
+                            </td>
+                            <td>
+                                {% if item.status == "PASS" %}
+                                    <span class="badge badge-pass px-2 py-1"><i class="bi bi-check-circle-fill me-1"></i>PASS</span>
+                                {% elif item.status == "NEEDS MANUAL REVIEW" %}
+                                    <span class="badge badge-review px-2 py-1"><i class="bi bi-exclamation-triangle-fill me-1"></i>NEEDS REVIEW</span>
+                                {% else %}
+                                    <span class="badge badge-missing px-2 py-1"><i class="bi bi-x-circle-fill me-1"></i>MISSING</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if item.evidence_snippet %}
+                                    <div class="snippet-box mb-2">
+                                        <i class="bi bi-quote me-1 text-primary"></i>"{{ item.evidence_snippet }}"
+                                    </div>
+                                {% endif %}
+                                <small class="text-muted d-block">{{ item.explanation }}</small>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+</div>
+{% endblock %}

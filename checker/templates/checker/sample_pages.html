@@ -1,0 +1,87 @@
+{% extends "checker/base.html" %}
+
+{% block title %}Built-in Demo Sample Pages{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-10">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <div>
+                <h3 class="fw-bold mb-0">Built-in Test Policy Samples</h3>
+                <p class="text-muted small">Use these pages to test the compliance engine directly without needing an external live website.</p>
+            </div>
+            <div class="btn-group">
+                <a href="?type=compliant" class="btn btn-sm {% if sample_type == 'compliant' %}btn-success{% else %}btn-outline-success{% endif %}">
+                    Compliant Sample
+                </a>
+                <a href="?type=non_compliant" class="btn btn-sm {% if sample_type == 'non_compliant' %}btn-danger{% else %}btn-outline-danger{% endif %}">
+                    Non-Compliant Sample
+                </a>
+            </div>
+        </div>
+
+        {% if sample_type == 'compliant' %}
+        <div class="alert alert-success d-flex align-items-center gap-2 mb-4">
+            <i class="bi bi-check-circle-fill fs-4"></i>
+            <div>
+                <strong>Fully Compliant Example Page:</strong> Includes all Twilio & A2P 10DLC required clauses (bolded STOP/HELP, safe-harbor originator opt-in exclusion, carrier disclaimer, etc.).
+            </div>
+        </div>
+
+        <div class="card p-4 shadow-sm mb-4">
+            <h4 class="fw-bold text-dark border-bottom pb-2">Acme Corp - Privacy Policy</h4>
+            <h6 class="fw-bold mt-3">1. Information We Collect and How It Is Used</h6>
+            <p>We collect personal information including name, email address, and mobile phone number when you voluntarily submit inquiries. How we use your information: We use your data exclusively to deliver requested service notifications, account verification codes, and client updates.</p>
+
+            <h6 class="fw-bold mt-3">2. Mobile Information and Messaging Opt-In Non-Sharing Disclosure</h6>
+            <p>Mobile information and opt-in consent will not be shared with third parties or affiliates for marketing or promotional purposes.</p>
+            <p class="border-start border-3 border-success ps-3 fst-italic bg-light py-2">
+                All the above categories exclude text messaging originator opt-in data and consent; this information won't be shared with any third parties.
+            </p>
+        </div>
+
+        <div class="card p-4 shadow-sm">
+            <h4 class="fw-bold text-dark border-bottom pb-2">Acme Corp - Terms of Service & SMS Conditions</h4>
+            <h6 class="fw-bold mt-3">1. Program Name & Description</h6>
+            <p>Welcome to Acme Corp SMS Program. You may receive text messages and SMS alerts regarding your appointment confirmations, account status, and transaction updates.</p>
+
+            <h6 class="fw-bold mt-3">2. Message Rates & Frequency</h6>
+            <p>Message and data rates may apply. Message frequency varies depending on your account activity.</p>
+
+            <h6 class="fw-bold mt-3">3. Opt-Out & Support Assistance</h6>
+            <p>You can cancel the SMS service at any time. Just reply <strong>STOP</strong> to cancel. After you send the SMS message <strong>STOP</strong> to us, we will send you a confirmation message to confirm that you have been unsubscribed.</p>
+            <p>If you are experiencing issues with the messaging program you can reply with the keyword <strong>HELP</strong> for more assistance, or contact our customer support team directly at support@acmecorp.com or call 1-800-555-0199.</p>
+
+            <h6 class="fw-bold mt-3">4. Carrier Disclaimer</h6>
+            <p>Carriers are not liable for delayed or undelivered messages.</p>
+
+            <h6 class="fw-bold mt-3">5. Privacy</h6>
+            <p>Please review our full <a href="{% url 'demo_sample' %}?type=compliant">Privacy Policy</a> to understand how your data is handled.</p>
+        </div>
+
+        {% else %}
+
+        <div class="alert alert-danger d-flex align-items-center gap-2 mb-4">
+            <i class="bi bi-exclamation-triangle-fill fs-4"></i>
+            <div>
+                <strong>Non-Compliant Example Page:</strong> Missing critical A2P disclosures (generic sharing, un-bolded keywords, missing carrier disclaimer, no frequency disclosure).
+            </div>
+        </div>
+
+        <div class="card p-4 shadow-sm mb-4">
+            <h4 class="fw-bold text-dark border-bottom pb-2">Generic Corp - Privacy Policy</h4>
+            <h6 class="fw-bold mt-3">Information Sharing</h6>
+            <p>We may share your contact details and usage statistics with our trusted business partners, advertising vendors, and network affiliates for marketing promotions.</p>
+        </div>
+
+        <div class="card p-4 shadow-sm">
+            <h4 class="fw-bold text-dark border-bottom pb-2">Generic Corp - Terms of Use</h4>
+            <h6 class="fw-bold mt-3">SMS Notifications</h6>
+            <p>By registering, you agree that we might text you occasionally. To opt out, reply stop to unsubscribe. If you need help, type help.</p>
+            <p>Reach out to us if anything goes wrong.</p>
+        </div>
+
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

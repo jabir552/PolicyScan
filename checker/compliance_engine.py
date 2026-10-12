@@ -310,7 +310,7 @@ def check_tos_stop_instructions(text: str, sentences: List[str], **kwargs) -> Di
 
 def check_tos_help_instructions(text: str, sentences: List[str], **kwargs) -> Dict[str, Any]:
     """Check 7: HELP instructions."""
-    pattern = r"(reply\s+HELP(\s+for\s+help|\s+for\s+more\s+info)?|text\s+HELP|send\s+HELP|type\s+HELP|for\s+help\s+reply\s+HELP)"
+    pattern = r"(reply(\s+with\s+(the\s+)?keyword)?\s+HELP|text\s+HELP|send\s+HELP|type\s+HELP|for\s+help\s+reply\s+HELP|HELP\s+for\s+(more\s+)?(help|assistance|info))"
     
     if re.search(pattern, text, re.IGNORECASE):
         snippet = find_best_snippet(sentences, text, pattern)
